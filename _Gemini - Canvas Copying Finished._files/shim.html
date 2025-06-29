@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<!-- saved from url=(0132)blob:https://3fed4gsrle4myws1cm3a5sdaf0yna7s8vox1i6iux80lwrfza6-h769614562.scf.usercontent.goog/37de4f72-6b6f-4bd1-aca1-3c16d8fc4707 -->
+<html lang="en" class="scroll-smooth"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script>(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjhkZDUxMTBhMGIwYjdkNDJhNDM2ODg4MzdmODg5M2M2OTNhM2RhNDMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6XC9cL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbVwvZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwMzI4NzcwNTgxNzA3NTE3Mjk0OCIsImFwcElkIjoiNTE2ZjBlMjBmODJiLXZpa2FzLWd1cHRhLWludGVyYWN0aXZlLXJlc3VtZS01NjEiLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiZXhwIjoxNzUwNjM5NjczLCJpYXQiOjE3NTA2MzYwNzMsImFsZyI6IlJTMjU2In0.sQ8rTiUxYDBQLOOxInbbj3EKk_EmI4rOB38dt2kLNFGh_pgTs6Txu1kVP24tIkFa9EOOvBXFHJFOobv3Z2lNDcbEff6N75csSdyuxS8KN8lnZxsGZRYY6pMar8TX_qoV35WQWb_UPjZOLzRbInERJ9t3zwvBNue6i4jdHok4r06mj00skaNIKvPnvaTvIFjsrZ6IxKQjI8aIcdafZ8EI6RxypTKkZHmlPb6OREp5U-KWhHiHghih_3d2QyxXx3ikrIdT5z93JgMqp8gIy7XnIRCOGHg57wF8ZWXBnXjcJGvOcjMbKqXmwo5VKxSuYOCnKHtCVrgraIHOQ4zS7Cq7UQ","516f0e20f82b-vikas-gupta-interactive-resume-561")</script><script>(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script>let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          const mediaPromiseId = nextMediaPromiseId++;
+          const promise = new Promise((resolve, reject) => {
+            pendingMediaResolvers[mediaPromiseId] = (granted) => {
+              delete pendingMediaResolvers[mediaPromiseId];
+              if (granted) {
+                if (originalGetUserMedia) {
+                  originalGetUserMedia(constraints).then(resolve).catch(reject);
+                } else {
+                  reject(new Error("Original getUserMedia not available."));
+                }
+              } else {
+              reject(new DOMException('Permission denied', 'NotAllowedError'));
+            }
+          };
+        });
+
+        window.parent.postMessage({
+          type: 'requestMediaPermission',
+          constraints: constraints,
+          promiseId: mediaPromiseId,
+        }, '*');
+
+        return promise;
+      },
+      writable: false,
+      configurable: false
+    });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script>((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-2.5-flash-preview-04-17","imageModelName":"imagen-3.0-generate-002","videoModelName":"veo-2.0-generate-001","deprecatedTextModelNames":["gemini-2.0-flash"]})</script><script>(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vikas Gupta - Staff Android Engineer</title>
+    <!-- Chosen Palette: Warm Neutrals with Teal Accent -->
+    <!-- Application Structure Plan: A single-page portfolio design with a sticky navigation header. The structure includes: 1) A 'Home' hero section for the summary. 2) An 'Experience' section with an interactive vertical timeline to showcase career progression. 3) A 'Skills' dashboard with filterable categories and a Chart.js visualization to break down technical abilities. 4) An 'Impact' section with KPI cards to highlight major quantitative achievements. 5) A final 'Projects & Education' section. This structure allows for non-linear exploration of Vikas's profile, making it more engaging and user-friendly than a traditional resume format. The focus is on guiding the user through his key strengths and accomplishments effectively. -->
+    <!-- Visualization & Content Choices: 1. Summary -> Inform -> Hero section (HTML/CSS). 2. Experience -> Change over time -> Interactive vertical timeline (HTML/CSS/JS for interaction). 3. Skills -> Organize/Compare -> Filterable lists and a horizontal bar chart from Chart.js to show skill distribution by category. 4. Key Achievements -> Inform/"Wow" Factor -> KPI stat cards in a grid (HTML/CSS). 5. Projects/Education -> Inform -> Simple cards (HTML/CSS). This combination of static and dynamic elements aims to present the information clearly and interactively. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #1a1a1a;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #4DB6AC;
+            border: 3px solid #F8F7F4;
+        }
+        .timeline-item:not(:last-child):after {
+            content: '';
+            position: absolute;
+            left: -21px;
+            top: 25px;
+            width: 2px;
+            height: calc(100% + 2rem);
+            background-color: #4DB6AC;
+        }
+        .kpi-card {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+        [data-section] {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        [data-section].visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.visible{visibility:visible}.relative{position:relative}.sticky{position:sticky}.top-0{top:0px}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-12{margin-bottom:3rem}.mb-16{margin-bottom:4rem}.mb-4{margin-bottom:1rem}.mb-8{margin-bottom:2rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.mt-4{margin-top:1rem}.flex{display:flex}.grid{display:grid}.hidden{display:none}.min-h-\[70vh\]{min-height:70vh}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-4xl{max-width:56rem}.cursor-pointer{cursor:pointer}.list-inside{list-style-position:inside}.list-disc{list-style-type:disc}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-4{gap:1rem}.gap-8{gap:2rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-8 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(2rem * var(--tw-space-x-reverse));margin-left:calc(2rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.scroll-smooth{scroll-behavior:smooth}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-l-2{border-left-width:2px}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.bg-\[\#4DB6AC\]{--tw-bg-opacity:1;background-color:rgb(77 182 172 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/80{background-color:rgb(255 255 255 / 0.8)}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.p-6{padding:1.5rem}.p-8{padding:2rem}.p-3{padding:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-20{padding-top:5rem;padding-bottom:5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.pl-8{padding-left:2rem}.pl-4{padding-left:1rem}.text-center{text-align:center}.text-right{text-align:right}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.leading-tight{line-height:1.25}.text-\[\#4DB6AC\]{--tw-text-opacity:1;color:rgb(77 182 172 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:border-\[\#4DB6AC\]:hover{--tw-border-opacity:1;border-color:rgb(77 182 172 / var(--tw-border-opacity, 1))}.hover\:bg-gray-300:hover{--tw-bg-opacity:1;background-color:rgb(209 213 219 / var(--tw-bg-opacity, 1))}.hover\:text-\[\#4DB6AC\]:hover{--tw-text-opacity:1;color:rgb(77 182 172 / var(--tw-text-opacity, 1))}.hover\:shadow-xl:hover{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}@media (min-width: 640px){.sm\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}@media (min-width: 768px){.md\:flex{display:flex}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.md\:text-3xl{font-size:1.875rem;line-height:2.25rem}.md\:text-5xl{font-size:3rem;line-height:1}}@media (min-width: 1024px){.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:grid-cols-5{grid-template-columns:repeat(5, minmax(0, 1fr))}}</style></head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Vikas Gupta</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="blob:https://3fed4gsrle4myws1cm3a5sdaf0yna7s8vox1i6iux80lwrfza6-h769614562.scf.usercontent.goog/37de4f72-6b6f-4bd1-aca1-3c16d8fc4707#home" class="text-gray-600 hover:text-[#4DB6AC] transition">Home</a>
+                <a href="blob:https://3fed4gsrle4myws1cm3a5sdaf0yna7s8vox1i6iux80lwrfza6-h769614562.scf.usercontent.goog/37de4f72-6b6f-4bd1-aca1-3c16d8fc4707#experience" class="text-gray-600 hover:text-[#4DB6AC] transition">Experience</a>
+                <a href="blob:https://3fed4gsrle4myws1cm3a5sdaf0yna7s8vox1i6iux80lwrfza6-h769614562.scf.usercontent.goog/37de4f72-6b6f-4bd1-aca1-3c16d8fc4707#skills" class="text-gray-600 hover:text-[#4DB6AC] transition">Skills</a>
+                <a href="blob:https://3fed4gsrle4myws1cm3a5sdaf0yna7s8vox1i6iux80lwrfza6-h769614562.scf.usercontent.goog/37de4f72-6b6f-4bd1-aca1-3c16d8fc4707#impact" class="text-gray-600 hover:text-[#4DB6AC] transition">Impact</a>
+                <a href="blob:https://3fed4gsrle4myws1cm3a5sdaf0yna7s8vox1i6iux80lwrfza6-h769614562.scf.usercontent.goog/37de4f72-6b6f-4bd1-aca1-3c16d8fc4707#education" class="text-gray-600 hover:text-[#4DB6AC] transition">Education</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <section id="home" data-section="" class="min-h-[70vh] flex items-center visible">
+            <div class="w-full">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">Staff Android Engineer</h2>
+                <h3 class="text-2xl md:text-3xl font-medium text-[#4DB6AC] mt-2">Mobile App Development Leader &amp; AI Enthusiast</h3>
+                <p class="mt-6 max-w-3xl text-lg text-gray-700">
+                    Highly accomplished and energetic Staff Android Engineer with over 12 years of experience in designing, developing, and deploying high-quality, maintainable mobile applications. Passionate about translating innovative ideas into mobile technology solutions, with a keen focus on AI integration, including prompt engineering and the exploration of AI Agents for advanced test automation.
+                </p>
+                <div class="mt-8 flex flex-wrap gap-4 text-gray-700">
+                    <a href="mailto:vikashgupta625@gmail.com" class="flex items-center space-x-2 hover:text-[#4DB6AC] transition">
+                        <span>📧</span><span>vikashgupta625@gmail.com</span>
+                    </a>
+                    <span class="text-gray-300">|</span>
+                    <a href="tel:+919654811545" class="flex items-center space-x-2 hover:text-[#4DB6AC] transition">
+                        <span>📞</span><span>+91-9654811545</span>
+                    </a>
+                    <span class="text-gray-300">|</span>
+                    <a href="https://www.linkedin.com/in/vikas-gupta-20b32315/" target="_blank" class="flex items-center space-x-2 hover:text-[#4DB6AC] transition">
+                        <span>🔗</span><span>LinkedIn Profile</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" data-section="" class="py-20">
+            <h2 class="text-3xl font-bold text-center mb-12">Professional Experience</h2>
+             <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-16">My career journey reflects a consistent path of technical growth and leadership, from core engineering roles at Samsung to leading high-impact initiatives at Glance and Paytm. Below is an interactive timeline of my key roles and contributions.</p>
+            <div id="experience-timeline" class="relative max-w-2xl mx-auto pl-8 border-l-2 border-gray-200">
+            <div class="timeline-item mb-8 relative">
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 cursor-pointer transition hover:shadow-xl hover:border-[#4DB6AC]">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-xl text-gray-800">Staff Android Engineer</h3>
+                        <p class="text-[#4DB6AC] font-semibold">Physics Wallah (PW)</p>
+                    </div>
+                    <p class="text-sm text-gray-500 text-right">July 2023 – Present</p>
+                </div>
+                <div class="details hidden mt-4 pl-4 border-l-2 border-gray-200">
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>Monitor and enhance app vitals; automate Android release processes (Jenkins/Fastlane).</li><li>Guide developers on architectural best practices; oversee code reviews and problem-solving to ensure high-quality standards.</li><li>Drive Kotlin Multiplatform solutions for mobile; develop Over-The-Air (OTA) mechanisms to reduce Play Store dependency for Android/iOS.</li><li>Advance Android development efficiency through prompt engineering for AI tools and exploring AI Agents for intelligent test automation.</li>
+                    </ul>
+                </div>
+            </div>
+        </div><div class="timeline-item mb-8 relative">
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 cursor-pointer transition hover:shadow-xl hover:border-[#4DB6AC]">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-xl text-gray-800">SDE II</h3>
+                        <p class="text-[#4DB6AC] font-semibold">Glance</p>
+                    </div>
+                    <p class="text-sm text-gray-500 text-right">Aug 2021 – Jul 2023</p>
+                </div>
+                <div class="details hidden mt-4 pl-4 border-l-2 border-gray-200">
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>Integrated Glance with multiple OEMs (Samsung, Motorola, Realme), scaling the app to ~200M Daily Active Users (DAU).</li><li>Led the restructuring of the existing app architecture to ensure scalability and maintainability.</li><li>Developed and implemented critical new features, including a 'Kill Switch,' reactivation logic, and photo rotation capabilities.</li><li>Collaborated closely with OEM development teams for seamless Glance App integration and deep integration with the Android System UI Framework.</li><li>Recipient of the Real Star Award for outstanding contributions.</li>
+                    </ul>
+                </div>
+            </div>
+        </div><div class="timeline-item mb-8 relative">
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 cursor-pointer transition hover:shadow-xl hover:border-[#4DB6AC]">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-xl text-gray-800">Technical Lead</h3>
+                        <p class="text-[#4DB6AC] font-semibold">Paytm</p>
+                    </div>
+                    <p class="text-sm text-gray-500 text-right">Jul 2020 – Aug 2021</p>
+                </div>
+                <div class="details hidden mt-4 pl-4 border-l-2 border-gray-200">
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>Spearheaded initiatives to significantly improve Paytm App performance and stability.</li><li>Reduced app launch time from 7.95s to 2.49s (95th percentile).</li><li>Managed the Design Library, ensuring consistent look and feel across the Paytm App.</li><li>Improved app stability, increasing crash-free users from 98.2% to 99.8%.</li>
+                    </ul>
+                </div>
+            </div>
+        </div><div class="timeline-item mb-8 relative">
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 cursor-pointer transition hover:shadow-xl hover:border-[#4DB6AC]">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-xl text-gray-800">Senior Android Developer</h3>
+                        <p class="text-[#4DB6AC] font-semibold">Em3 Agri Services</p>
+                    </div>
+                    <p class="text-sm text-gray-500 text-right">Jul 2017 – Jul 2020</p>
+                </div>
+                <div class="details hidden mt-4 pl-4 border-l-2 border-gray-200">
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>Architected and developed the core Agri-tech Android application from scratch.</li><li>Managed the complete application lifecycle: Conceptualization, Design, Development, and Testing.</li><li>Designed architecture for Executive, Farmer, and Partner Apps.</li><li>Implemented key business features including farm management, order tracking, payment flows, and multi-lingual support.</li>
+                    </ul>
+                </div>
+            </div>
+        </div><div class="timeline-item mb-8 relative">
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 cursor-pointer transition hover:shadow-xl hover:border-[#4DB6AC]">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-xl text-gray-800">Lead Engineer</h3>
+                        <p class="text-[#4DB6AC] font-semibold">Samsung R&amp;D Institute</p>
+                    </div>
+                    <p class="text-sm text-gray-500 text-right">Dec 2012 – Jun 2017</p>
+                </div>
+                <div class="details hidden mt-4 pl-4 border-l-2 border-gray-200">
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        <li>Promoted from Senior Software Engineer to Lead Engineer.</li><li>Collaborated with Samsung HQ on critical releases for Flagship Models (S4, S5, S6, Note 4, Note 5).</li><li>Contributed to research projects, developing innovative Proof of Concepts (PoC).</li><li>Recipient of the Best Project Award and qualified for the Samsung Advance Algorithm Competency test.</li>
+                    </ul>
+                </div>
+            </div>
+        </div></div>
+        </section>
+
+        <section id="skills" data-section="" class="py-20 bg-white rounded-2xl shadow-lg">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-4">Technical Skills</h2>
+                 <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">I possess a diverse skill set spanning multiple languages, platforms, and tools. This dashboard provides a visual overview of my technical competencies and allows for filtering to explore specific areas of expertise.</p>
+                <div class="chart-container mb-12">
+                    <canvas id="skillsChart" width="1200" height="600" style="display: block; box-sizing: border-box; height: 300px; width: 600px;"></canvas>
+                </div>
+                <div class="text-center mb-8 space-x-2">
+                    <button data-filter="all" class="bg-[#4DB6AC] text-white px-4 py-2 rounded-full font-semibold">All</button>
+                    <button data-filter="Languages" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300">Languages</button>
+                    <button data-filter="Technologies" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300">Technologies</button>
+                    <button data-filter="Tools" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300">Databases</button>
+                     <button data-filter="AI/ML" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300">AI/ML</button>
+                </div>
+                <div id="skills-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 text-center"><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Languages">Java</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Languages">Kotlin</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Languages">Android</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Technologies">Android SDK</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Technologies">Arch. Components</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Technologies">Firebase</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Technologies">Kotlin Coroutines</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Technologies">Retrofit</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Technologies">AOSP</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Technologies">SystemUI</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Technologies">Dagger2</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Technologies">Hilt</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Tools">Android Studio</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Tools">Git</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Tools">Jenkins</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Tools">Fastlane</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Tools">IntelliJ</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Databases">MySQL</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Databases">Room</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="Databases">Realm</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="AI/ML">Prompt Engineering</div><div class="skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium" data-category="AI/ML">AI Agent Exploration</div></div>
+            </div>
+        </section>
+
+        <section id="impact" data-section="" class="py-20">
+            <h2 class="text-3xl font-bold text-center mb-4">Key Impact &amp; Achievements</h2>
+             <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">Throughout my career, I have focused on delivering tangible results. Here are some of the key metrics that demonstrate the impact of my work on application performance, user growth, and stability.</p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+                <div class="kpi-card p-8 rounded-xl text-center">
+                    <p class="text-5xl font-bold text-[#4DB6AC]">~200M</p>
+                    <p class="mt-2 text-lg font-semibold text-gray-800">Daily Active Users</p>
+                    <p class="mt-1 text-gray-600">Scaled Glance app by integrating with major OEMs like Samsung and Motorola.</p>
+                </div>
+                <div class="kpi-card p-8 rounded-xl text-center">
+                    <p class="text-5xl font-bold text-[#4DB6AC]">99.8%</p>
+                    <p class="mt-2 text-lg font-semibold text-gray-800">Crash-Free Users</p>
+                    <p class="mt-1 text-gray-600">Improved Paytm app stability from 98.2% through robust error handling.</p>
+                </div>
+                <div class="kpi-card p-8 rounded-xl text-center">
+                    <p class="text-5xl font-bold text-[#4DB6AC]">2.49s</p>
+                    <p class="mt-2 text-lg font-semibold text-gray-800">App Launch Time</p>
+                    <p class="mt-1 text-gray-600">Enhanced Paytm app launch from 7.95s, significantly boosting user experience.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="education" data-section="" class="py-20">
+             <h2 class="text-3xl font-bold text-center mb-12">Education &amp; Academic Publications</h2>
+             <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">My formal education laid the foundation for my technical career, complemented by academic research and project work during my post-graduation.</p>
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-xl text-gray-800">ABV-Indian Institute of Information Technology and Management, Gwalior</h3>
+                    <p class="text-[#4DB6AC] font-semibold mt-1">Integrated Post Graduation (2013)</p>
+                    <p class="text-gray-600 mt-2">Scored 7.5 CGPI</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-xl text-gray-800">Published Research</h3>
+                    <p class="text-[#4DB6AC] font-semibold mt-1">Indian Journal of Computer Science &amp; Engineering (IJCSE)</p>
+                    <p class="text-gray-600 mt-2">"Optimized flame detection using image processing based techniques"</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const experienceData = [
+        {
+            company: "Physics Wallah (PW)",
+            role: "Staff Android Engineer",
+            duration: "July 2023 – Present",
+            points: [
+                "Monitor and enhance app vitals; automate Android release processes (Jenkins/Fastlane).",
+                "Guide developers on architectural best practices; oversee code reviews and problem-solving to ensure high-quality standards.",
+                "Drive Kotlin Multiplatform solutions for mobile; develop Over-The-Air (OTA) mechanisms to reduce Play Store dependency for Android/iOS.",
+                "Advance Android development efficiency through prompt engineering for AI tools and exploring AI Agents for intelligent test automation."
+            ]
+        },
+        {
+            company: "Glance",
+            role: "SDE II",
+            duration: "Aug 2021 – Jul 2023",
+            points: [
+                "Integrated Glance with multiple OEMs (Samsung, Motorola, Realme), scaling the app to ~200M Daily Active Users (DAU).",
+                "Led the restructuring of the existing app architecture to ensure scalability and maintainability.",
+                "Developed and implemented critical new features, including a 'Kill Switch,' reactivation logic, and photo rotation capabilities.",
+                "Collaborated closely with OEM development teams for seamless Glance App integration and deep integration with the Android System UI Framework.",
+                "Recipient of the Real Star Award for outstanding contributions."
+            ]
+        },
+        {
+            company: "Paytm",
+            role: "Technical Lead",
+            duration: "Jul 2020 – Aug 2021",
+            points: [
+                "Spearheaded initiatives to significantly improve Paytm App performance and stability.",
+                "Reduced app launch time from 7.95s to 2.49s (95th percentile).",
+                "Managed the Design Library, ensuring consistent look and feel across the Paytm App.",
+                "Improved app stability, increasing crash-free users from 98.2% to 99.8%."
+            ]
+        },
+        {
+            company: "Em3 Agri Services",
+            role: "Senior Android Developer",
+            duration: "Jul 2017 – Jul 2020",
+            points: [
+                "Architected and developed the core Agri-tech Android application from scratch.",
+                "Managed the complete application lifecycle: Conceptualization, Design, Development, and Testing.",
+                "Designed architecture for Executive, Farmer, and Partner Apps.",
+                "Implemented key business features including farm management, order tracking, payment flows, and multi-lingual support."
+            ]
+        },
+        {
+            company: "Samsung R&D Institute",
+            role: "Lead Engineer",
+            duration: "Dec 2012 – Jun 2017",
+            points: [
+                "Promoted from Senior Software Engineer to Lead Engineer.",
+                "Collaborated with Samsung HQ on critical releases for Flagship Models (S4, S5, S6, Note 4, Note 5).",
+                "Contributed to research projects, developing innovative Proof of Concepts (PoC).",
+                "Recipient of the Best Project Award and qualified for the Samsung Advance Algorithm Competency test."
+            ]
+        }
+    ];
+
+    const skillsData = {
+        "Languages": ["Java", "Kotlin", "Android"],
+        "Technologies": ["Android SDK", "Arch. Components", "Firebase", "Kotlin Coroutines", "Retrofit", "AOSP", "SystemUI", "Dagger2", "Hilt"],
+        "Tools": ["Android Studio", "Git", "Jenkins", "Fastlane", "IntelliJ"],
+        "Databases": ["MySQL", "Room", "Realm"],
+        "AI/ML": ["Prompt Engineering", "AI Agent Exploration"]
+    };
+
+    const timelineContainer = document.getElementById('experience-timeline');
+    experienceData.forEach(job => {
+        const item = document.createElement('div');
+        item.className = 'timeline-item mb-8 relative';
+        item.innerHTML = `
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 cursor-pointer transition hover:shadow-xl hover:border-[#4DB6AC]">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-xl text-gray-800">${job.role}</h3>
+                        <p class="text-[#4DB6AC] font-semibold">${job.company}</p>
+                    </div>
+                    <p class="text-sm text-gray-500 text-right">${job.duration}</p>
+                </div>
+                <div class="details hidden mt-4 pl-4 border-l-2 border-gray-200">
+                    <ul class="list-disc list-inside text-gray-600 space-y-2">
+                        ${job.points.map(p => `<li>${p}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+        `;
+        timelineContainer.appendChild(item);
+    });
+
+    timelineContainer.addEventListener('click', function(e) {
+        const header = e.target.closest('.bg-white');
+        if (header) {
+            const details = header.querySelector('.details');
+            if (details) {
+                details.classList.toggle('hidden');
+            }
+        }
+    });
+
+    const skillsListContainer = document.getElementById('skills-list');
+    const skillFilters = document.querySelectorAll('[data-filter]');
+    let currentFilter = 'all';
+
+    function renderSkills() {
+        skillsListContainer.innerHTML = '';
+        Object.entries(skillsData).forEach(([category, skills]) => {
+            if (currentFilter === 'all' || currentFilter === category) {
+                skills.forEach(skill => {
+                    const skillElement = document.createElement('div');
+                    skillElement.className = 'skill-item bg-gray-100 p-3 rounded-lg text-gray-700 font-medium';
+                    skillElement.textContent = skill;
+                    skillElement.dataset.category = category;
+                    skillsListContainer.appendChild(skillElement);
+                });
+            }
+        });
+    }
+
+    skillFilters.forEach(button => {
+        button.addEventListener('click', () => {
+            currentFilter = button.dataset.filter;
+            skillFilters.forEach(btn => {
+                btn.classList.remove('bg-[#4DB6AC]', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            button.classList.add('bg-[#4DB6AC]', 'text-white');
+            button.classList.remove('bg-gray-200', 'text-gray-700');
+            renderSkills();
+        });
+    });
+
+    renderSkills();
+
+    const ctx = document.getElementById('skillsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(skillsData),
+            datasets: [{
+                label: 'Number of Skills',
+                data: Object.values(skillsData).map(arr => arr.length),
+                backgroundColor: [
+                    'rgba(77, 182, 172, 0.6)',
+                    'rgba(129, 212, 250, 0.6)',
+                    'rgba(179, 157, 219, 0.6)',
+                    'rgba(255, 204, 128, 0.6)',
+                    'rgba(240, 98, 146, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(77, 182, 172, 1)',
+                    'rgba(129, 212, 250, 1)',
+                    'rgba(179, 157, 219, 1)',
+                    'rgba(255, 204, 128, 1)',
+                    'rgba(240, 98, 146, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.raw}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    const sections = document.querySelectorAll('[data-section]');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+});
+</script>
+
+
+</body></html>
